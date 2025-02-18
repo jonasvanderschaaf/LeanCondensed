@@ -28,7 +28,7 @@ variable (hF : IsPromotable R F)
 
 def promote : C ⥤ ModuleCat.{w} R where
   obj X := ModuleCat.of R (F.obj X)
-  map f := ModuleCat.asHom {
+  map f := ModuleCat.ofHom {
     toFun := F.map f
     map_add' := (hF.isLinearMap f).map_add
     map_smul' := (hF.isLinearMap f).map_smul }
@@ -40,7 +40,7 @@ variable (hG : IsPromotable R G)
 variable {α : F ⟶ G} (h : ∀ X : C, IsLinearMap R (α.app X))
 
 def promoteMap : promote R hF ⟶ promote R hG where
-  app X := ModuleCat.asHom {
+  app X := ModuleCat.ofHom {
     toFun := α.app X
     map_add' := (h X).map_add
     map_smul' := (h X).map_smul }
@@ -88,7 +88,7 @@ variable (X) in
 def promote : CondensedMod.{u} R where
   val := {
     obj := fun S ↦ ModuleCat.of R (X.val.obj S)
-    map := fun f ↦ ModuleCat.asHom {
+    map := fun f ↦ ModuleCat.ofHom {
       toFun := X.val.map f
       map_add' := (h _ _ f.unop).map_add
       map_smul' := (h _ _ f.unop).map_smul } }
@@ -105,7 +105,7 @@ variable {Y : CondensedSet.{u}}
 
 def promoteMap : promote R X h ⟶ promote R Y hY where
   val := {
-    app := fun S ↦ ModuleCat.asHom {
+    app := fun S ↦ ModuleCat.ofHom {
       toFun := f.val.app S
       map_add' := (hh _).map_add
       map_smul' := (hh _).map_smul }
@@ -132,7 +132,7 @@ variable (F : Type (u+1) ⥤ CondensedSet.{u})
 
 def promoteFunctor : ModuleCat.{u+1} R ⥤ CondensedMod.{u} R where
   obj X := promote R (F.obj X.1) (h X.1)
-  map f := promoteMap R _ _ (F.map f) (hh _ _ f)
+  map f := promoteMap R _ _ (F.map f) (by apply hh)
   map_id X := by
     simp
     apply Sheaf.hom_ext

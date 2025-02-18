@@ -19,7 +19,7 @@ universe u
 
 open CategoryTheory LightProfinite OnePoint Limits LightCondensed MonoidalCategory MonoidalClosed
 
-attribute [local instance] ConcreteCategory.instFunLike
+attribute [local instance] CategoryTheory.HasForget.instFunLike
 
 section MonoidalClosed
 
@@ -65,7 +65,7 @@ namespace LightProfinite
 
 instance (S : LightProfinite.{u}) : Injective S := sorry
 
-def shift : ℕ∪{∞} ⟶ ℕ∪{∞} where
+def shift' :  C(ℕ∪{∞}, ℕ∪{∞}) where
   toFun
     | ∞ => ∞
     | OnePoint.some n => (n + 1 : ℕ)
@@ -75,6 +75,15 @@ def shift : ℕ∪{∞} ⟶ ℕ∪{∞} where
     simp only [isOpen_iff_of_mem h, isClosed_discrete, isCompact_iff_finite, true_and] at hU
     refine ⟨sSup (Option.some ⁻¹' U)ᶜ + 1, fun n hn ↦ by
       simpa using not_mem_of_csSup_lt (Nat.succ_le_iff.mp hn) (Set.Finite.bddAbove hU)⟩
+
+def shift : ℕ∪{∞} ⟶ ℕ∪{∞} := TopCat.ofHom shift'
+
+@[simp]
+lemma shift_infty : shift ∞ = ∞ := rfl
+
+@[simp]
+lemma shift_n : ∀ n : ℕ, shift (OnePoint.some n) = OnePoint.some (n + 1)
+  := fun _ ↦ rfl
 
 end LightProfinite
 
@@ -94,7 +103,7 @@ lemma internallyProjective_iff_tensor_condition (P : LightCondMod R) : Internall
 
 def P_map :
     (free R).obj (LightProfinite.of PUnit.{1}).toCondensed ⟶ (free R).obj (ℕ∪{∞}).toCondensed :=
-  (lightProfiniteToLightCondSet ⋙ free R).map (⟨fun _ ↦ ∞, continuous_const⟩)
+  (lightProfiniteToLightCondSet ⋙ free R).map (TopCat.ofHom ⟨fun _ ↦ ∞, continuous_const⟩)
 
 def P : LightCondMod R := cokernel (P_map R)
 
