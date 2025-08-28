@@ -10,24 +10,22 @@ open CategoryTheory
 
 universe u
 
-def empty_elim {p : Sort u} {X : LightProfinite} (hX : ¬ Nonempty X) (x : X) : p := (hX ⟨x⟩).elim
-
-def empty_subset {X : LightProfinite} (hX : ¬ Nonempty X) (s : Set X) : s = ⊤ := by
+def empty_subset {X : LightProfinite} (hX : IsEmpty X) (s : Set X) : s = ⊤ := by
   ext x
-  exact empty_elim hX x
+  exact hX.elim x
 
-def empty_map {X Y : LightProfinite} (hY : ¬ Nonempty Y) (f : X ⟶ Y) : ¬ Nonempty X :=
-  fun h ↦ h.elim (fun x ↦ hY ⟨f x⟩)
+def empty_map {X Y : LightProfinite} (hY : IsEmpty Y) (f : X ⟶ Y) : IsEmpty X :=
+  ⟨fun x ↦ hY.elim (f x)⟩
 
-def empty_iso {X Y : LightProfinite} (hY : ¬ Nonempty Y) (f : X ⟶ Y) : IsIso f := by
+def empty_iso {X Y : LightProfinite} (hY : IsEmpty Y) (f : X ⟶ Y) : IsIso f := by
   let finv : Y ⟶ X := CompHausLike.ofHom _ {
-    toFun y := empty_elim hY y
+    toFun y := hY.elim y
     continuous_toFun := by
       apply Continuous.mk
       intro s empty_elim
-      rw [empty_subset hY ((fun y ↦ _root_.empty_elim hY y) ⁻¹' s)]
+      rw [empty_subset hY ((fun y ↦ hY.elim y) ⁻¹' s)]
       exact TopologicalSpace.isOpen_univ }
   refine IsIso.mk ⟨finv, ?_⟩
   constructor <;> ext x
-  exact empty_elim hY (f x)
-  exact empty_elim hY x
+  exact hY.elim (f x)
+  exact hY.elim x

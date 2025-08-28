@@ -464,7 +464,8 @@ private theorem proj_explicit {X Y : LightCondMod R} (p : X ⟶ Y) [hp : Epi p] 
     change _ = (((free R).mapCocone (explicitPullback.explicitRegular π')).ι.app one ≫ hc.desc c') ≫ p
     erw [hc.fac]
     rw [this]
-  · have : ¬Nonempty (S' ⊗ ℕ∪{∞} : LightProfinite) := empty_map hS' (fst _ _)
+  · have hS' : IsEmpty S' := by exact not_nonempty_iff.mp hS'
+    have : IsEmpty (S' ⊗ ℕ∪{∞} : LightProfinite) := empty_map inferInstance (fst _ _)
     have : IsIso π' := empty_iso this _
     obtain ⟨π'inv, h, _⟩ := this
     use (lightProfiniteToLightCondSet ⋙ (free R)).map (π'inv ≫ g') ≫ g
