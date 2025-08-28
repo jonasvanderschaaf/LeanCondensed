@@ -11,9 +11,9 @@ noncomputable section
 
 open CategoryTheory Quiver Countable
 
-instance {J : Type u} [Countable J] [Category J] [Quiver.IsThin J] :
+instance {J : Type u} [Countable J] [Category J] [IsThin J] :
     CountableCategory J :=
-  CountableCategory.mk inferInstance (fun _ _ ↦ ⟨fun _ ↦ 0, fun _ _ _ ↦ Subsingleton.elim _ _⟩)
+  CountableCategory.mk inferInstance inferInstance
 
-noncomputable instance {J : Type u} [Finite J] [Category J] [Quiver.IsThin J] : FinCategory J := by
-  apply FinCategory.mk (Fintype.ofFinite J) (fun j j' ↦ Fintype.ofFinite (j ⟶ j'))
+noncomputable instance {J : Type u} [Finite J] [Category J] [IsThin J] : FinCategory J := by
+  apply FinCategory.mk (Fintype.ofFinite _) (fun j j' ↦ Fintype.ofFinite _)
