@@ -8,24 +8,16 @@ import Mathlib
 open CategoryTheory
 
 variable {C : Type*} [Category C] {D : Type*} [Category D] {F G : C ⥤ D}
+  [F.PreservesEpimorphisms]
 
-lemma epi_of_rightEpi {f g : Arrow C} (π : f ⟶ g) [Epi f.hom] [Epi π.right] : Epi g.hom :=
-  have : Epi (π.left ≫ g.hom) := by
-    rw [←Functor.id_map π.left, π.w, Functor.id_map]
-    infer_instance
-  epi_of_epi (π.left) _
-
-lemma epi_ofRetract {f g : Arrow C} (r : Retract g f) [Epi f.hom] : Epi g.hom :=
-  epi_of_rightEpi r.r
-
-lemma preservesEpi_ofEpi {f : F ⟶ G} (hf : ∀ X, Epi (f.app X)) [F.PreservesEpimorphisms] :
-    G.PreservesEpimorphisms where
+lemma preservesEpi_ofEpi {f : F ⟶ G} (hf : ∀ X, Epi (f.app X)) : G.PreservesEpimorphisms
+    where
   preserves {X Y} π hπ :=
     have : Epi (f.app X ≫ G.map π) := by
       rw [←f.naturality π]
       infer_instance
     epi_of_epi (f.app X) _
 
-lemma preservesEpi_ofRetract (r : Retract G F) [F.PreservesEpimorphisms] :
-  G.PreservesEpimorphisms := preservesEpi_ofEpi
+lemma preservesEpi_ofRetract (r : Retract G F) : G.PreservesEpimorphisms :=
+  preservesEpi_ofEpi
     (fun _ ↦ (r.map ((evaluation _ _).obj _)).splitEpi.epi)

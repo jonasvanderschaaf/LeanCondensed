@@ -35,7 +35,7 @@ def CategoryTheory.Limits.parallelPairNatTrans {C : Type*} [Category C]
 
 lemma isClosed_fibres {T : LightProfinite} (f : T ⟶ ℕ∪{∞}) (s : ℕ → Set T)
   (hs : ∀ n (x : s n), f x = n) (hs' : ∀ n, IsClosed (s n)) :
-    IsClosed ({t | f t = ∞} ∪ ⋃ n, s n) := by
+    IsClosed ((⋃ n, s n) ∪ {t | f t = ∞}) := by
   apply IsClosed.mk
   let fibre : ℕ → Set T := fun n ↦ f ⁻¹' {OnePoint.some n}
   have clopen : ∀ n, IsClopen (fibre n) := by
@@ -44,7 +44,7 @@ lemma isClosed_fibres {T : LightProfinite} (f : T ⟶ ℕ∪{∞}) (s : ℕ → 
     exact ⟨fun h ↦ by simp_all, trivial⟩
 
   suffices ({t | f t = ∞} ∪ ⋃ n, s n)ᶜ = ⋃ n, (s n)ᶜ ∩ fibre n by
-    rw [this]
+    rw [Set.union_comm, this]
     exact isOpen_iUnion (fun i ↦ IsOpen.inter (hs' i).1 (clopen i).2)
 
   ext x
@@ -88,12 +88,9 @@ lemma subspaceCover { S T : LightProfinite } (π : T ⟶ S ⊗ ℕ∪{∞}) [hep
         (fibre_incl ∞ ((i ≫ π) ≫ snd _ _) ≫ i ≫ π ≫ fst S ℕ∪{∞}) := by
   let space : Set T :=
     Set.iUnion (fun (n : ℕ) ↦ Set.range (σ' (OnePoint.some n))) ∪ {t : T | (π ≫ snd _ _) t = ∞}
-  have : IsClosed space := by
-    unfold space
-    rw [Set.union_comm]
-    exact isClosed_fibres _ _
-      (fun n ⟨x, ⟨s, hs⟩⟩ ↦ by simp only [← hs, ← ConcreteCategory.comp_apply, hσ' _ _])
-      (fun n ↦ IsCompact.isClosed (isCompact_range (σ' n).1.continuous))
+  have : IsClosed space := isClosed_fibres _ _
+    (fun n ⟨x, ⟨s, hs⟩⟩ ↦ by simp only [← hs, ← ConcreteCategory.comp_apply, hσ' _ _])
+    (fun n ↦ IsCompact.isClosed (isCompact_range (σ' n).1.continuous))
 
   let T' : LightProfinite := ⟨TopCat.of space, inferInstance, inferInstance⟩
 
@@ -180,7 +177,6 @@ lemma subspaceCover { S T : LightProfinite } (π : T ⟶ S ⊗ ℕ∪{∞}) [hep
           unfold fibre_incl
           simp only [CompHausLike.hom_ofHom, ContinuousMap.coe_mk]
           exact ht⟩
-      let p := coprod.inr (X := T') (Y := (explicitPullback _ _)) x
       use coprod.inr (X := T') (Y := (explicitPullback _ _)) x
       rw [smart_cover, ←ConcreteCategory.comp_apply]
       simp only [coprod.inr_desc]
@@ -332,8 +328,6 @@ private lemma comm_sq {X Y : LightCondMod R} (p : X ⟶ Y) [hp : Epi p] {S : Lig
   exact ⟨T, π, g, (LightProfinite.epi_iff_surjective π).mpr hπ, comm⟩
 
 instance : PreservesFiniteCoproducts (lightProfiniteToLightCondSet ⋙ (free R)) := by
-  have : PreservesFiniteCoproducts lightProfiniteToLightCondSet :=
-    LightProfinite.preservesFiniteCoproductsToLightCondSet
   have : IsLeftAdjoint (free R) := ⟨_, ⟨LightCondensed.freeForgetAdjunction R⟩⟩
   infer_instance
 
